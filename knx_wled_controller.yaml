@@ -1,0 +1,103 @@
+blueprint:
+  name: KNX WLED Controller
+  description: Steuert eine WLED Leuchte über einen KNX Taster (z.B. Gira Tastsensor 3). Unterstützt kurz/lang Aktionen für linke und rechte Taste.
+  domain: automation
+  input:
+    knx_left_short:
+      name: Gruppenadresse Links Kurz
+      description: KNX GA für kurzen Druck links
+      selector:
+        text:
+
+    knx_left_long:
+      name: Gruppenadresse Links Lang
+      description: KNX GA für langen Druck links
+      selector:
+        text:
+
+    knx_right_short:
+      name: Gruppenadresse Rechts Kurz
+      description: KNX GA für kurzen Druck rechts
+      selector:
+        text:
+
+    knx_right_long:
+      name: Gruppenadresse Rechts Lang
+      description: KNX GA für langen Druck rechts
+      selector:
+        text:
+
+    target_light:
+      name: Ziel-Licht
+      description: WLED Light Entity
+      selector:
+        entity:
+          domain: light
+
+    color_effect:
+      name: Farbwechsel Effekt
+      description: WLED Effekt für Farbrotation
+      default: "Colorloop"
+      selector:
+        text:
+
+trigger:
+  - platform: knx
+    destination: !input knx_left_short
+    id: left_short
+  - platform: knx
+    destination: !input knx_left_long
+    id: left_long
+  - platform: knx
+    destination: !input knx_right_short
+    id: right_short
+  - platform: knx
+    destination: !input knx_right_long
+    id: right_long
+
+action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: left_short
+        sequence:
+        - service: light.turn_on
+          target:
+            entity_id: !input target_light
+          data:
+            kelvin: 4000
+            brightness: 255
+
+    - conditions:
+      - condition: trigger
+        id: left_long
+        sequence:
+        - service: light.turn_on
+          target:
+            entity_id: !input target_light
+          data:
+            kelvin: 2200
+            transition: 3
+            brightness: 200
+
+    - conditions:
+      - condition: trigger
+        id: right_short
+        sequence:
+        - service: light.turn_on
+          target:
+            entity_id: !input target_light
+          data:
+            hs_color: [30,90]
+            brightness: 200
+
+    - conditions:
+      - condition: trigger
+        id: right_long
+        sequence:
+        - service: select.select_option
+          target:
+            entity_id: "select.wled_effect"
+          data:
+            option: !input color_effect
+            mode: restart
