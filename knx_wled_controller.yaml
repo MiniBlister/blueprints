@@ -32,7 +32,7 @@ blueprint:
       description: WLED Light Entity
       selector:
         entity:
-          domain: light
+            domain: light
           
     color_effect:
       name: Farbwechsel Effekt
