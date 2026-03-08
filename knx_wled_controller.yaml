@@ -33,7 +33,7 @@ blueprint:
       selector:
         entity:
           domain: light
-
+          
     color_effect:
       name: Farbwechsel Effekt
       description: WLED Effekt für Farbrotation
